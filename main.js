@@ -34,8 +34,11 @@ const flashcardsData = [
 const cardContainer = document.getElementById('card-container');
 const startButton = document.getElementById('start-button');
 const resetButton = document.getElementById('reset-button');
+const doneButton = document.querySelector("#done-button")
+let selectedCards = []; 
 
 const handleStart = () => {
+  createScoreElement();
   flashcardsData.forEach((item) => {
     //* Card add section
     const cardElement = document.createElement('div');
@@ -48,16 +51,59 @@ const handleStart = () => {
       console.log(item.word);
       cardElement.classList.add('border-red-500');
       cardElement.innerText = item.meaning;
+
+      selectedCards.push(item);
+      updateScore();
     });
   });
 
-  resetButton.classList.remove('hidden');
   startButton.classList.add('hidden');
+  resetButton.classList.remove('hidden');
+  doneButton.classList.remove('hidden');
+  updateScore()
 };
 
 const handleReset = () => {
   cardContainer.innerHTML = '';
+  selectedCards = [];
 
   startButton.classList.remove('hidden');
   resetButton.classList.add('hidden');
+  doneButton.classList.add('hidden');
 };
+
+const handleDone = function () {
+  selectedCards.forEach((item) => {
+    const cardElement = document.createElement('div');
+    cardElement.className = 'border-2 border-red-500 rounded-md p-5 h-full';
+    cardElement.innerText = item.word;
+    cardContainer.appendChild(cardElement);
+  });
+
+   // Remove unselected cards
+   const unselectedCards = Array.from(cardContainer.children).filter((card) => {
+    return !selectedCards.some((selectedCard) => card.innerText.includes(selectedCard.word));
+  });
+
+  unselectedCards.forEach((card) => {
+    card.remove();
+  });
+
+  startButton.classList.remove('hidden');
+  resetButton.classList.add('hidden');
+  doneButton.classList.add('hidden');
+}
+
+function createScoreElement() {
+  const scoreElement = document.createElement('div');
+  scoreElement.id = 'score-card';
+  scoreElement.className = 'text-lg font-semibold';
+  document.body.appendChild(scoreElement);
+}
+
+function updateScore() {
+  const scoreElement = document.getElementById('score-card');
+  if (scoreElement) {
+    scoreElement.innerText = `Score: ${selectedCards.length}`;
+  }
+}
